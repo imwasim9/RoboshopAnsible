@@ -7,7 +7,7 @@
     zone_id: Z028151432MT6NLGG3PXL # replace with your ID
     domain_name: "wasdaws.shop"
     # we can pass instances through command line using -e
-    instances: 
+    instances:
     - mongodb
     # - redis
     # - mysql
