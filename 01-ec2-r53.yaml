@@ -7,7 +7,7 @@
     zone_id: Z028151432MT6NLGG3PXL
     domain_name: "wasdaws.shop"
     instances:
-      - mongodb
+    - mongodb
     # - redis
     # - mysql
     # - rabbitmq
@@ -23,6 +23,10 @@
         Name: "{{ item }}"
     loop: "{{ instances}}"
     register: ec2_info
+
+  - name: Print EC2 Info
+    ansible.builtin.debug:
+      msg: "{{ ec2_info }}"
 
   # - name: Add Route53 Record
   #   amazon.aws.route53:
