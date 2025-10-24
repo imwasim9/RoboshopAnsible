@@ -7,9 +7,8 @@
     zone_id: Z028151432MT6NLGG3PXL
     domain_name: "wasdaws.shop"
 
-  tasks:
-  
-  - name: ceate EC2 Instance
+  tasks:  
+  - name: create EC2 Instance
     amazon.aws.ec2_instance:
       name: "{{ item }}"
       instance_type: t3.micro
