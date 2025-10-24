@@ -13,20 +13,20 @@
     # - rabbitmq
 
   tasks:  
-  - name: create EC2 Instance
-    amazon.aws.ec2_instance:
-      name: "{{ item }}"
-      instance_type: t3.micro
-      security_group: "{{ sg_id  }}"
-      image_id: "{{ ami_id }}"
-      tags:
-        Name: "{{ item }}"
-    loop: "{{ instances}}"
-    register: ec2_info
+    - name: create EC2 Instance
+      amazon.aws.ec2_instance:
+        name: "{{ item }}"
+        instance_type: t3.micro
+        security_group: "{{ sg_id  }}"
+        image_id: "{{ ami_id }}"
+        tags:
+          Name: "{{ item }}"
+      loop: "{{ instances}}"
+      register: ec2_info
 
-  - name: Print EC2 Info
-    ansible.builtin.debug:
-      msg: "{{ ec2_info }}"
+    - name: Print EC2 Info
+      ansible.builtin.debug:
+        msg: "{{ ec2_info }}"
 
   # - name: Add Route53 Record
   #   amazon.aws.route53:
