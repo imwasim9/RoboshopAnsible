@@ -6,6 +6,11 @@
     sg_id: sg-06b6b91b959b0f8d8
     zone_id: Z028151432MT6NLGG3PXL
     domain_name: "wasdaws.shop"
+    instances:
+      - mongodb
+    # - redis
+    # - mysql
+    # - rabbitmq
 
   tasks:  
   - name: create EC2 Instance
