@@ -6,19 +6,27 @@
     sg_id: sg-06b6b91b959b0f8d8
     zone_id: Z028151432MT6NLGG3PXL
     domain_name: "wasdaws.shop"
+    instances:
+    - mongodb
+    # - redis
+    # - mysql
+    # - rabbitmq
 
-  tasks:
-  
-  - name: ceate EC2 Instance
+  tasks:  
+    - name: create EC2 Instance
       amazon.aws.ec2_instance:
-        name: {{ item}}
+        name: "{{ item }}"
         instance_type: t3.micro
-        security_group: "{{ sg_id  }}"
+        security_group: "{{ sg_id }}"
         image_id: "{{ ami_id }}"
         tags:
           Name: "{{ item }}"
-      loop: "{{ instances}}"
+      loop: "{{ instances }}"
       register: ec2_info
+
+    - name: Print EC2 Info
+      ansible.builtin.debug:
+        msg: "{{ ec2_info }}"
 
   # - name: Add Route53 Record
   #   amazon.aws.route53:
