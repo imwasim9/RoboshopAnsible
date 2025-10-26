@@ -36,7 +36,7 @@
         record: "{{item.item}}.{{ domain_name }}"
         type: A
         ttl: 1
-        value: "{{ item.instances[0].private_ip }}"
+        value: "{{ item.instances[0].private_ip_address }}"
       loop: "{{ ec2_info.results }}"
       
 
