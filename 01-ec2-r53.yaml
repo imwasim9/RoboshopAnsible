@@ -7,7 +7,8 @@
     zone_id: Z028151432MT6NLGG3PXL
     domain_name: "wasdaws.shop"
     instances:
-    - mongodb
+    # we can pass multiple instances via command line using -e instances="['frontend','catalogue']"
+    # - mongodb
     # - redis
     # - mysql
     # - rabbitmq
@@ -28,8 +29,14 @@
       ansible.builtin.debug:
         msg: "{{ ec2_info }}"
 
-  # - name: Add Route53 Record
-  #   amazon.aws.route53:
-  #     state: present
-  #     zone: "{{ domain_name }}"
+    - name: Add Route53 Record
+      amazon.aws.route53:
+        state: present
+        zone: "{{ domain_name }}"
+        record: "{{item.item}}.{{ domain_name }}"
+        type: A
+        ttl: 1
+        value: "{{ item.instances[0].private_ip }}"
+      loop: "{{ ec2_info.results }}"
+      
 
