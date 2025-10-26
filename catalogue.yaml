@@ -37,8 +37,8 @@
 
   - name: delete catalogue file if exists in temp
     ansible.builtin.file:
-    state: absent
-    path: /tmp/catalogue.zip
+      state: absent
+      path: /tmp/catalogue.zip
 
   - name: copy catalogue file to temp folder
     ansible.builtin.get_url:
