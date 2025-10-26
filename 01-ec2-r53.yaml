@@ -37,6 +37,20 @@
         type: A
         ttl: 1
         value: "{{ item.instances[0].private_ip_address }}"
+        overwrite: yes
+      loop: "{{ ec2_info.results }}"
+
+    
+    - name: Add Route 53 record for frontend
+      amazon.aws.route53:
+        state: present
+        zone: "{{ domain_name }}"
+        record: "{{ item.item }}. {{ domain_name }}"
+        type: A
+        ttl: 1
+        value: "{{ item.instances[0].public_ip_address }}"
+        overwrite: yes
+      when: item.item == "frontend"
       loop: "{{ ec2_info.results }}"
       
 
