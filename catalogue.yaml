@@ -1,0 +1,86 @@
+- name: setup catalogue server
+  hosts: catalogue
+  become: yes
+  vars:
+    app_user: roboshop
+    app_dir: /app
+    mongo_host: mongodb.wasdaws.shop
+  tasks:
+  - name: disable default nodejs
+    ansible.builtin.command: dnf module disable nodejs -y
+
+  - name: enable nodejs 20
+    ansible.builtin.command: dnf module enable nodejs:20 -y
+
+  - name: install nodejs
+    ansible.builtin.package:
+      name: nodejs
+      state: present
+
+  - name: add application user
+    ansible.builtin.user:
+      name: "{{ app_user }}"
+      state: present
+      shell: /sbin/nologin
+      home: "{{ app_dir }}"
+
+    # Safe to remove directory, because 2nd time if we run it will download freshly. no error if does not exist
+  - name: remove app directory
+    ansible.builtin.file:
+      path: "{{ app_dir }}"
+      state: absent
+
+  - name: create app directory
+    ansible.builtin.file:
+      state: directory
+      path: "{{ app_dir }}"
+
+  - name: delete catalogue file if exists in temp
+    ansible.builtin.file:
+    state: absent
+    path: /tmp/catalogue.zip
+
+  - name: copy catalogue file to temp folder
+    ansible.builtin.get_url:
+      url: https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip
+      dest: /tmp/catalogue.zip
+  
+  - name: extract catalogue file
+    ansible.builtin.unarchive:
+      src: /tmp/catalogue.zip
+      dest: "{{ app_dir }}"
+      remote_src: yes
+
+  - name: install npm dependencies
+    community.general.npm:
+      path: /app
+
+  - name: copy catalogue service
+    ansible.builtin.copy:
+      src: catalogue.service
+      dest: /etc/systemd/system/catalogue.service
+  
+  - name: copy mongodb repo
+    ansible.builtin.copy:
+      src: mongo.repo
+      dest: /etc/yum.repos.d/mongo.repo
+
+  - name: install mongosh client
+    ansible.builtin.package:
+      name: mongodb-mongosh
+      state: present
+  
+  - name: connect to mongodb catalogue
+    ansible.builtin.command: mongosh mongodb.daws86s.shop --quiet --eval "db.getMongo().getDBNames().indexOf('catalogue')"
+    register: catalogue_output
+
+  - name: load products into mongodb
+    ansible.builtin.shell: mongosh --host mongodb.wasdaws.shop < /app/db/master-dtaa.js
+    when: catalogue_output.stdout | int < 0
+
+  - name: daemon reload and start the catalogue
+    ansible.builtin.systemd_service:
+      daemon_reload: yes
+      name: catalogue
+      state: started
+      enabled: yes
