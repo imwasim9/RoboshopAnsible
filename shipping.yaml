@@ -1,0 +1,93 @@
+- name: configure shipping server
+  hosts: shipping
+  become: yes
+  tasks:
+
+  - name: install maven and mysql
+    ansible.builtin.dnf:
+      name: {{ item }}
+      state: present
+    loop:
+    - maven
+    - mysql
+
+  - name: install mysql python libraries
+    ansible.builtin.pip:
+      excutable: pip3.9
+      name: {{ item }}    
+    loop:
+    - cryptography
+    - PyMySQL
+
+  - name: create roboshop system user
+    ansible.builitn.user:
+      name: roboshop
+      comment: RoboShop system user for shipping
+      system: true
+      shell: /sbin/nologin
+      home: /app
+
+  - name: remove app directory if exists
+    ansible.builtin.file:
+      path: /app
+      state: absent
+
+  - name: create app directory
+    ansible.builtin.file:
+      state: directory
+      path: /app
+
+  - name: Delete shipping app in tmp folder if exists
+    ansible.builitn.file:
+      path: /tmp/shipping.zip
+      state: absent
+
+  - name: downlaod shiiping app
+    ansible.builitn.get_url:
+      url: https://roboshop-artifacts.s3.amazonaws.com/shipping-v3.zip
+      dest: /tmp/shipping.zip
+
+  - name: unzip the downlaoded application to /app folder
+    ansible.builitn.unarchive:
+      src: /tmp/shipping.zip
+      dest: /app
+      remote_src: yes
+
+  - name: install maven dependencies
+    ansible.builitn.command: mvn clean package
+    args:
+      chdir: /app
+
+  - name: move jar file
+    ansible.builtin.command: mv target/shipping-1.0.jar shipping.jar
+    args:
+      chdir: /app
+  
+  - name: copy shipping service
+    ansible.builtin.copy:
+      src: shipping.service
+      dest: /etc/systemd/system/shipping.service
+
+  - name: import shipping data into mysql
+    community.mysql.mysql_db:
+      state: import
+      name: all
+      login_host: mysql.wasdaws.shop
+      login_user: root
+      login_password: RoboShop@1
+      target: {{ item }}
+
+    loop:
+    - /app/db/schema.sql
+    - /app/db/app-user.sql
+    - /app/db/master-data.sql
+
+  - name: daemon reload enable and start
+    ansible.builitn.systemd_service:
+      name: shipping
+      enabled: yes
+      state: started
+      daemon_reload: yes
+
+
+  
