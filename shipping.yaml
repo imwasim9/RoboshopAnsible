@@ -5,7 +5,7 @@
 
   - name: install maven and mysql
     ansible.builtin.dnf:
-      name: {{ item }}
+      name: "{{ item }}"
       state: present
     loop:
     - maven
@@ -14,7 +14,7 @@
   - name: install mysql python libraries
     ansible.builtin.pip:
       excutable: pip3.9
-      name: {{ item }}    
+      name: "{{ item }}"    
     loop:
     - cryptography
     - PyMySQL
@@ -75,7 +75,7 @@
       login_host: mysql.wasdaws.shop
       login_user: root
       login_password: RoboShop@1
-      target: {{ item }}
+      target: "{{ item }}"
 
     loop:
     - /app/db/schema.sql
