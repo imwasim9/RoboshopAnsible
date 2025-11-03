@@ -6,7 +6,7 @@
     ansible.builtin.command: dnf disbale nodejs -y
 
   - name: enable nodejs 20
-    ansible.builtin.command: dnf enable nodejs:20 -yes
+    ansible.builtin.command: dnf enable nodejs:20 -y
   
   - name: install nodejs
     ansible.builtin.package:
@@ -14,7 +14,7 @@
       state: present
   
   - name: create roboshop system user
-    ansible.builitn.user: 
+    ansible.builtin.user: 
       name: roboshop
       comment: Roboshop system user for cart
       system: true
@@ -42,7 +42,7 @@
       dest: /tmp/cart.zip
 
   - name: extract cart application
-    ansible.builitn.unarchive:
+    ansible.builtin.unarchive:
       src: /tmp/cart.zip
       dest: /app
       remote_src: yes
@@ -52,12 +52,12 @@
       path: /app
 
   - name: copy cart service to system path
-    ansible.builitn.copy:
+    ansible.builtin.copy:
       src: cart.service
       dest: /etc/systemd/system/cart.service
   
   - name: daemon reload enable and start
-    ansible.builitn.systemd_service:
+    ansible.builtin.systemd_service:
       name: cart
       enabled: true
       state: started

@@ -5,7 +5,7 @@
 
   - name: install required python packages
     ansible.builtin.dnf:
-      name: {{ item }}
+      name: "{{ item }}"
       state: present
     loop:
     - python3
@@ -31,7 +31,7 @@
       path: /app
 
   - name: Delete payment app in tmp folder is exists
-    ansible.builitn.file:
+    ansible.builtin.file:
       path: /tmp/payment.zip
       state: absent
 
@@ -41,13 +41,13 @@
       dest: /tmp/payment.zip
 
   - name: extract payment application
-    ansible.builitn.unarchive:
+    ansible.builtin.unarchive:
       src: /tmp/payment.zip
       dest: /app
       remote_src: yes
 
   - name: install python dependencies
-    ansible.builitn.pip:
+    ansible.builtin.pip:
       requirements: requirements.txt
       executable: pip3.9
     args:
@@ -59,7 +59,7 @@
       dest: /etc/systemd/system/payment.service
 
   - name: daemon reload enable and start
-    ansible.builitn.systemd_service:
+    ansible.builtin.systemd_service:
       enabled: yes
       state: started
       daemon_reload: true
