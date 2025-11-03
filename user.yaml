@@ -63,5 +63,5 @@
       name: user
       enabled: true
       state: started
-      daemon_relaod: true
+      daemon_reload: true
 
