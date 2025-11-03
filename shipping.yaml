@@ -38,23 +38,23 @@
       path: /app
 
   - name: Delete shipping app in tmp folder if exists
-    ansible.builitn.file:
+    ansible.builtin.file:
       path: /tmp/shipping.zip
       state: absent
 
   - name: downlaod shiiping app
-    ansible.builitn.get_url:
+    ansible.builtin.get_url:
       url: https://roboshop-artifacts.s3.amazonaws.com/shipping-v3.zip
       dest: /tmp/shipping.zip
 
   - name: unzip the downlaoded application to /app folder
-    ansible.builitn.unarchive:
+    ansible.builtin.unarchive:
       src: /tmp/shipping.zip
       dest: /app
       remote_src: yes
 
   - name: install maven dependencies
-    ansible.builitn.command: mvn clean package
+    ansible.builtin.command: mvn clean package
     args:
       chdir: /app
 
@@ -83,7 +83,7 @@
     - /app/db/master-data.sql
 
   - name: daemon reload enable and start
-    ansible.builitn.systemd_service:
+    ansible.builtin.systemd_service:
       name: shipping
       enabled: yes
       state: started
